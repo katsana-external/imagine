@@ -27,7 +27,7 @@ class ImagineServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerCoreContainerAliases(): void
     {
         $this->callAfterResolving('orchestra.imagine', function ($manager, $app) {
-            $namespace = $this->hasPackageRepository() ? 'orchestra/imagine::' : 'orchestra.imagine';
+            $namespace = 'orchestra.imagine';
 
             $manager->setConfiguration($app->make('config')->get($namespace));
         });
@@ -46,27 +46,15 @@ class ImagineServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     public function boot()
     {
-        $path = \realpath(__DIR__.'/../');
+        $path = \realpath(__DIR__ . '/../');
 
-        $this->addConfigComponent('orchestra/imagine', 'orchestra/imagine', "{$path}/config");
-
-        if (! $this->hasPackageRepository()) {
-            $this->bootUsingLaravel($path);
-        }
-
-        $this->registerCoreContainerAliases();
-    }
-
-    /**
-     * Boot using Laravel setup.
-     */
-    protected function bootUsingLaravel(string $path): void
-    {
         $this->mergeConfigFrom("{$path}/config/config.php", 'orchestra.imagine');
 
         $this->publishes([
-            "{$path}/config/config.php" => \config_path('orchestra/imagine.php'),
-        ]);
+            "{$path}/config/config.php" => config_path('orchestra/imagine.php'),
+        ], ['orchestra-imagine', 'laravel-config']);
+
+        $this->registerCoreContainerAliases();
     }
 
     /**
